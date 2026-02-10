@@ -112,7 +112,7 @@ class Snake {
 		};
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `GAME OVER<br />You scored ${snake.eaten}.<br />Press to try again.`;
+			this.gameOverNode.innerHTML = `GAME OVER<br />You scored ${snake.eaten}.<br />Tap to try again.`;
 			this.setGameOverScreen('true');
 			return;
 		};
