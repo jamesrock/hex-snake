@@ -118,7 +118,7 @@ class Snake {
 		};
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(snake.eaten)}</div><div>Tap to continue</div>`;
+			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(this.eaten)}</div><div>Tap to continue</div>`;
 			this.setGameOverScreen('true');
 			return;
 		};
@@ -130,11 +130,10 @@ class Snake {
 
 		var 
 		collision = false,
-		snake = this,
 		seg;
 
-		for(var i = 1; i < snake.segments.length; i++) {
-			seg = snake.segments[i];
+		for(var i = 1; i < this.segments.length; i++) {
+			seg = this.segments[i];
 			if(seg.x === x && seg.y === y) {
 				collision = true;
 			};
@@ -189,14 +188,13 @@ class Snake {
 	move(x, y) {
 		
 		var 
-		snake = this,
-		seg = snake.segments.shift();
+		seg = this.segments.shift();
 
 		seg.x = x;
 		seg.y = y;
-		snake.segments.push(seg);
+		this.segments.push(seg);
 
-		snake.draw();
+		this.draw();
 
 	};
 	turn(direction) {
@@ -214,7 +212,7 @@ class Snake {
 	};
 	updateScore() {
 
-		this.scoreNode.innerHTML = `score: ${this.eaten}`;
+		this.scoreNode.innerHTML = `score: ${formatNumber(this.eaten)}`;
 		return this;
 
 	};
