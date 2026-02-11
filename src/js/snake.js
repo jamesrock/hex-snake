@@ -1,4 +1,15 @@
-import { isValidKey } from '@jamesrock/rockjs';
+import { 
+	isValidKey,
+	random
+} from '@jamesrock/rockjs';
+
+const scale = (a) => {
+	return (a * 2);
+};
+
+const unscale = (a) => {
+	return (a / 2);
+};
 
 class Food {
 	constructor(x, y) {
@@ -34,8 +45,10 @@ class Snake {
 
 		this.gameOverNode.classList.add('game-over');
 
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
+		this.canvas.width = scale(this.width);
+		this.canvas.height = scale(this.height);
+
+		this.canvas.style.width = `${this.width}px`;
 
 		this.node.appendChild(this.scoreNode);
 		this.node.appendChild(this.canvas);
@@ -69,24 +82,21 @@ class Snake {
 	};
 	draw() {
 
-		var
-		snake = this;
+		this.canvas.width = scale(this.width);
 
-		snake.canvas.width = snake.width;
-
-		snake.segments.forEach(function(seg) {
-			snake.ctx.fillStyle = seg.color;
-			snake.ctx.fillRect(snake.inflate(seg.x), snake.inflate(seg.y), snake.size, snake.size);
+		this.segments.forEach((seg) => {
+			this.ctx.fillStyle = seg.color;
+			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
 		});
 		
-		snake.foods.forEach(function(food) {
-			snake.ctx.fillStyle = food.color;
-			snake.ctx.fillRect(snake.inflate(food.x), snake.inflate(food.y), snake.size, snake.size);
+		this.foods.forEach((food) => {
+			this.ctx.fillStyle = food.color;
+			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
 		});
 
-		setTimeout(function() {
-			snake.update();
-		}, snake.speed - (snake.multiplier * snake.eaten));
+		setTimeout(() => {
+			this.update();
+		}, this.speed - (this.multiplier * this.eaten));
 
 	};
 	update() {
@@ -112,7 +122,7 @@ class Snake {
 		};
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `GAME OVER<br />You scored ${snake.eaten}.<br />Tap to try again.`;
+			this.gameOverNode.innerHTML = `GAME OVER<br />You scored ${snake.eaten}.<br />Tap to continue.`;
 			this.setGameOverScreen('true');
 			return;
 		};
@@ -121,8 +131,6 @@ class Snake {
 
 	};
 	checkCollision(x, y) {
-
-		// log && console.log(`checkCollision(${x}, ${y})`);
 
 		var 
 		collision = false,
@@ -136,7 +144,7 @@ class Snake {
 			};
 		};
 
-		if((x === -1) || (y === -1) || (this.inflate(x) === this.width) || (this.inflate(y) === this.height)) {
+		if((x === -1) || (y === -1) || (x === this.deflate(this.width)) || (y === this.deflate(this.height))) {
 			collision = true;
 		};
 
@@ -145,18 +153,15 @@ class Snake {
 	};
 	checkFood(x, y) {
 
-		var
-		snake = this;
-
-		snake.foods.forEach(function(food, i) {
+		this.foods.forEach((food, i) => {
 
 			if(food.x === x && food.y === y) {
 				
-				snake.eaten ++;
-				snake.segments.push(new Segment(food.x, food.y));
+				this.eaten ++;
+				this.segments.push(new Segment(food.x, food.y));
 
-				snake.foods.splice(i, 1);
-				snake.updateScore();
+				this.foods.splice(i, 1);
+				this.updateScore();
 
 				return 'break';
 				
@@ -164,13 +169,13 @@ class Snake {
 
 		});
 
-		if(snake.foods.length === 0) {
+		if(this.foods.length === 0) {
 			
-			snake.createFood();
+			this.createFood();
 
 		};
 		
-		snake.move(x, y);
+		this.move(x, y);
 
 	};
 	createFood() {
@@ -179,13 +184,13 @@ class Snake {
 			x, y
 		} = this.getRandomXAndY();
 
+		console.log('createFood', x, y);
+
 		this.foods.push(new Food(x, y));
 		return this;
 
 	};
 	move(x, y) {
-
-		// log && console.log(`move(${x}, ${y})`);
 		
 		var 
 		snake = this,
@@ -199,8 +204,6 @@ class Snake {
 
 	};
 	turn(direction) {
-
-		// log && console.log(`snake.turn(${direction})`);
 
 		if(!direction) {
 			return;
@@ -241,21 +244,22 @@ class Snake {
 		return (a * this.size);
 
 	};
-	getRandom(max) {
-
-		return Math.floor(Math.random() * ((max - this.size) / this.size));
+	deflate(a) {
+		
+		return (a / unscale(this.size));
 
 	};
 	getRandomXAndY() {
 
 		let 
-		x = this.getRandom(this.width),
-		y = this.getRandom(this.height);
+		width = this.deflate(this.width)-1,
+		height = this.deflate(this.height)-1,
+		x = random(0, width),
+		y = random(0, height);
 
 		while(this.checkForSegment(`${x}${y}`)) {
-			x = this.getRandom(this.width);
-			y = this.getRandom(this.height);
-			log && console.log('segment clash');
+			x = random(0, width);
+			y = random(0, height);
 		};
 
 		return {
@@ -277,7 +281,7 @@ class Snake {
 	};
 	width = 350;
 	height = 450;
-	size = 10;
+	size = scale(10);
 	speed = 300;
 	multiplier = 5;
 	eaten = 0;
@@ -311,7 +315,6 @@ opposites = {
 	'down': 'up'
 },
 directionsArray = Object.keys(directionsKeyMap),
-log = true,
 snake = new Snake();
 
 snake.renderTo(body);
