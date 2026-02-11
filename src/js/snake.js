@@ -92,7 +92,7 @@ class Snake {
 
 		setTimeout(() => {
 			this.update();
-		}, 500 - (10 * this.eaten));
+		}, 400 - (5 * this.eaten));
 
 	};
 	update() {
@@ -153,6 +153,7 @@ class Snake {
 			if(food.x === x && food.y === y) {
 				
 				this.eaten ++;
+				
 				this.segments.push(new Segment(food.x, food.y));
 
 				this.foods.splice(i, 1);
@@ -178,8 +179,6 @@ class Snake {
 		const {
 			x, y
 		} = this.getRandomXAndY();
-
-		console.log('createFood', x, y);
 
 		this.foods.push(new Food(x, y));
 		return this;

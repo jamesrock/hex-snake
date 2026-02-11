@@ -1,3 +1,7 @@
+:root {
+	--background: floralwhite;
+}
+
 * {
 	padding: 0;
 	margin: 0;
@@ -9,6 +13,7 @@ html {
 }
 
 body {
+	background-color: var(--background);
 	font-family: monospace;
 	font-size: 18px;
 	text-align: center;
@@ -23,6 +28,7 @@ canvas {
 	border: solid 4px #CCC;
 	margin: 0 auto;
 	position: relative;
+	background-color: white;
 }
 
 .snake {
@@ -36,14 +42,15 @@ canvas {
 
 .game-over {
 	position: absolute;
-	inset: 0;
+	inset: -10px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	backdrop-filter: blur(5px);
 	gap: 10px;
 	padding: 20px;
-	background-color: rgba(255, 255, 255, 0.9);
+	background-color: rgba(255, 250, 240, 0.25);
 }
 
 .game-over[data-active="false"] {
