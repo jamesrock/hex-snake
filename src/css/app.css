@@ -28,6 +28,7 @@
 
 :root {
 	--background: floralwhite;
+	--foreground: #333;
 }
 
 * {
@@ -50,6 +51,7 @@ html {
 
 body {
 	background-color: var(--background);
+	color: var(--foreground);
 	font-family: 'Poppins';
 	font-weight: 500;
 	font-size: 18px;
@@ -78,19 +80,6 @@ canvas {
 	position: relative;
 }
 
-.score {
-	padding-bottom: 40px;
-	color: rgb(130, 130, 130);
-}
-
-.score,
-.game-over-score {
-	text-align: center;
-	font-size: 60px;
-	font-weight: 600;
-	line-height: 1;
-}
-
 .game-over {
 	position: absolute;
 	inset: -10px;
@@ -102,10 +91,18 @@ canvas {
 	gap: 10px;
 	padding: 20px;
 	background-color: rgba(255, 250, 240, 0.25);
+	text-shadow: 0 0 10px white;
 
-	.continue {
-		font-size: 16px;
+	.score {
+		font-size: 60px;
+		font-weight: 600;
+		line-height: 1;
 	}
+
+	.best {
+		padding-top: 10px;
+	}
+	
 }
 
 .game-over[data-active="false"] {

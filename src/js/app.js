@@ -6,7 +6,8 @@ import {
 	random,
 	pluckFirst,
 	Rounder,
-	Scaler
+	Scaler,
+	Storage
 } from '@jamesrock/rockjs';
 
 class Food {
@@ -33,13 +34,11 @@ class Snake {
 	constructor() {
 
 		this.node = document.createElement('div');
-		this.scoreNode = document.createElement('div');
 		this.gameOverNode = document.createElement('div');
 		this.canvas = document.createElement('canvas');
 		this.ctx = this.canvas.getContext('2d');
 
 		this.node.classList.add('snake');
-		this.scoreNode.classList.add('score');
 
 		this.gameOverNode.classList.add('game-over');
 
@@ -48,11 +47,8 @@ class Snake {
 
 		this.canvas.style.width = `${this.width}px`;
 
-		this.node.appendChild(this.scoreNode);
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
-
-		this.updateScore();
 
 		this.reset();
 
@@ -153,7 +149,6 @@ class Snake {
 			this.eaten ++;
 			this.segments.push(new Segment(x, y));
 			this.foods.splice(this.foods.indexOf(food), 1);
-			this.updateScore();
 			this.makeFood(1);
 
 		};
@@ -181,7 +176,6 @@ class Snake {
 		this.checkFood(x, y);
 
 		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `<h2>GAME OVER</h2><p class="game-over-score">${formatNumber(this.eaten)}</p><p class="continue">Tap to continue.</p>`;
 			this.setGameOver(true);
 		};
 
@@ -194,12 +188,6 @@ class Snake {
 
 		this.directions.push(direction);
 
-		return this;
-
-	};
-	updateScore() {
-
-		this.scoreNode.innerHTML = `${formatNumber(this.eaten)}`;
 		return this;
 
 	};
@@ -218,7 +206,6 @@ class Snake {
 		this.setGameOver(false);
 		this.makeFood();
 		this.update();
-		this.updateScore();
 		return this;
 
 	};
@@ -255,6 +242,16 @@ class Snake {
 
 	};
 	setGameOver(a) {
+
+		if(a) {
+			const best = storage.get('best') || 0;
+			storage.set('best', this.eaten > best ? this.eaten : best);
+			this.gameOverNode.innerHTML = `\
+				<h2>GAME OVER!</h2>\
+				<p class="score">${this.eaten}</p>\
+				<p class="continue">Tap to continue.</p>\
+				<p class="best">Best: ${storage.get('best')}</p>`;
+		};
 
 		this.gameOver = a;
 		this.gameOverNode.dataset.active = a;
@@ -302,6 +299,7 @@ opposites = {
 	down: 'up'
 },
 adjustment = 0,
+storage = new Storage('me.jamesrock.snake'),
 rounder = new Rounder(60),
 scaler = new Scaler(2),
 directionsArray = Object.keys(directionsKeyMap),
