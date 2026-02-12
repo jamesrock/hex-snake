@@ -2,16 +2,11 @@ import {
 	isValidKey,
 	formatNumber,
 	makeArray,
-	random
+	random,
+	pluckFirst,
+	Rounder,
+	Scaler
 } from '@jamesrock/rockjs';
-
-const scale = (a) => {
-	return (a * 2);
-};
-
-const unscale = (a) => {
-	return (a / 2);
-};
 
 class Food {
 	constructor(x, y) {
@@ -47,8 +42,8 @@ class Snake {
 
 		this.gameOverNode.classList.add('game-over');
 
-		this.canvas.width = scale(this.width);
-		this.canvas.height = scale(this.height);
+		this.canvas.width = scaler.inflate(this.width);
+		this.canvas.height = scaler.inflate(this.height);
 
 		this.canvas.style.width = `${this.width}px`;
 
@@ -67,7 +62,7 @@ class Snake {
 	};
 	draw() {
 
-		this.canvas.width = scale(this.width);
+		this.canvas.width = scaler.inflate(this.width);
 
 		this.segments.forEach((seg) => {
 			this.ctx.fillStyle = seg.color;
@@ -79,21 +74,16 @@ class Snake {
 			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
 		});
 
-		clearTimeout(this.timer);
-
-		this.timer = setTimeout(() => {
-			this.update();
-		}, 300 - this.eaten);
-
 	};
 	update() {
 
 		var 
 		seg = this.segments[this.segments.length-1],
 		x = seg.x,
-		y = seg.y;
+		y = seg.y,
+		direction = this.direction = this.getDirection();
 
-		switch(this.direction) {
+		switch(direction) {
 			case directions.right:
 				x ++;
 			break;
@@ -108,24 +98,40 @@ class Snake {
 			break;
 		};
 
-		if(this.checkCollision(x, y)) {
-			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(this.eaten)}</div><div>Tap to continue</div>`;
-			this.setGameOverScreen(true);
+		this.move(x, y);
+
+		this.draw();
+		
+		clearTimeout(this.timer);
+
+		if(this.gameOver) {
 			return;
 		};
 
-		this.checkFood(x, y);
+		this.timer = setTimeout(() => {
+			
+			if(this.directions.length===0) {
+				// nothing queued, continue heading in the same direction
+				this.directions.push(direction);
+			};
 
+			this.update();
+
+		}, (300 + adjustment) - this.eaten);
+
+	};
+	getDirection() {
+
+		return pluckFirst(this.directions);
+		
 	};
 	checkCollision(x, y) {
 
-		var 
-		collision = false,
-		seg;
+		let collision = false;
 
-		for(var i = 1; i < this.segments.length; i++) {
-			seg = this.segments[i];
-			if(seg.x === x && seg.y === y) {
+		for(var i = 1; i < this.segments.length-2; i++) {
+			const {x: sX, y: sY} = this.segments[i];
+			if(sX === x && sY === y) {
 				collision = true;
 			};
 		};
@@ -139,25 +145,20 @@ class Snake {
 	};
 	checkFood(x, y) {
 
-		this.foods.forEach((food, i) => {
+		const food = this.foods.find((food) => food.x === x && food.y === y);
 
-			if(food.x === x && food.y === y) {
-				
-				this.eaten ++;
-				this.segments.push(new Segment(food.x, food.y));
-				this.foods.splice(i, 1);
-				this.updateScore();
-				this.createFood(1);
-				return 'break';
-				
-			};
+		if(food) {
+			
+			this.eaten ++;
+			this.segments.push(new Segment(x, y));
+			this.foods.splice(this.foods.indexOf(food), 1);
+			this.updateScore();
+			this.makeFood(1);
 
-		});
-		
-		this.move(x, y);
+		};
 
 	};
-	createFood(count = 17) {
+	makeFood(count = 20) {
 
 		makeArray(count).forEach(() => {
 			const {
@@ -170,25 +171,27 @@ class Snake {
 	};
 	move(x, y) {
 		
-		var 
-		seg = this.segments.shift();
+		const seg = this.segments.shift();
 
 		seg.x = x;
 		seg.y = y;
 		this.segments.push(seg);
 
-		this.draw();
+		this.checkFood(x, y);
+
+		if(this.checkCollision(x, y)) {
+			this.gameOverNode.innerHTML = `<div>GAME OVER</div><div>Score: ${formatNumber(this.eaten)}</div><div>Tap to continue</div>`;
+			this.setGameOver(true);
+		};
 
 	};
 	turn(direction) {
 
-		if(!direction) {
+		if(!direction || direction === this.directions[this.directions.length-1] || direction === opposites[this.direction]) {
 			return;
 		};
 
-		if((this.direction != opposites[direction])) {
-			this.direction = direction;
-		};
+		this.directions.push(direction);
 
 		return this;
 
@@ -208,12 +211,12 @@ class Snake {
 	reset() {
 
 		this.eaten = 0;
-		this.direction = directions.right;
+		this.directions = [directions.right];
 		this.foods = [];
 		this.segments = makeArray(10, (a, i) => new Segment(i, 0));
-		this.createFood();
-		this.draw();
-		this.setGameOverScreen(false);
+		this.setGameOver(false);
+		this.makeFood();
+		this.update();
 		this.updateScore();
 		return this;
 
@@ -225,7 +228,7 @@ class Snake {
 	};
 	deflate(a) {
 		
-		return (a / unscale(this.size));
+		return (a / scaler.deflate(this.size));
 
 	};
 	getRandomXAndY() {
@@ -250,9 +253,10 @@ class Snake {
 		};
 
 	};
-	setGameOverScreen(active) {
+	setGameOver(a) {
 
-		this.gameOverNode.dataset.active = active;
+		this.gameOver = a;
+		this.gameOverNode.dataset.active = a;
 		return this;
 
 	};
@@ -268,19 +272,16 @@ class Snake {
 	};
 	width = 350;
 	height = 450;
-	size = scale(10);
+	size = scaler.inflate(10);
 	eaten = 0;
-	direction = directions.right;
+	directions = [directions.right];
 	segments = [];
 	foods = [];
+	gameOver = false;
 };
 
-var 
+const 
 body = document.body,
-swipeThreshold = 30,
-swipeThresholdInverse = (swipeThreshold*-1),
-touchX,
-touchY,
 directions = {
 	'left': 'left',
 	'up': 'up',
@@ -299,12 +300,19 @@ opposites = {
 	'up': 'down',
 	'down': 'up'
 },
+adjustment = 0,
+rounder = new Rounder(60),
+scaler = new Scaler(2),
 directionsArray = Object.keys(directionsKeyMap),
-snake = new Snake();
+snake = window.snake = new Snake();
+
+let 
+touchX = 0,
+touchY = 0;
 
 snake.renderTo(body);
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', (e) => {
 		
 	if(isValidKey(e.key, directionsArray)) {
 		return snake.turn(directionsKeyMap[e.key]);
@@ -312,34 +320,30 @@ document.addEventListener('keydown', function(e) {
 
 });
 
-document.addEventListener('touchstart', function(e) {
+document.addEventListener('touchstart', (e) => {
 
-	var
-	firstTouch = e.touches[0];
-
-	touchX = firstTouch.clientX;
-	touchY = firstTouch.clientY;
+	touchX = e.touches[0].clientX;
+	touchY = e.touches[0].clientY;
 
 });
 
-document.addEventListener('touchmove', function(e) {
+document.addEventListener('touchmove', (e) => {
 
-	var
-	firstTouch = e.touches[0],
-	touchXDiff = (firstTouch.clientX - touchX),
-	touchYDiff = (firstTouch.clientY - touchY),
-	direction;
+	const { clientX, clientY } = e.touches[0];
+	const touchXDiff = rounder.round(clientX - touchX);
+	const touchYDiff = rounder.round(clientY - touchY);
+	let direction;
 
-	if((touchXDiff >= swipeThreshold)) {
+	if((touchXDiff > 0)) {
 		direction = directions.right;
 	}
-	else if((touchXDiff <= swipeThresholdInverse)) {
+	else if((touchXDiff < 0)) {
 		direction = directions.left;
 	}
-	else if((touchYDiff >= swipeThreshold)) {
+	else if((touchYDiff > 0)) {
 		direction = directions.down;
 	}
-	else if((touchYDiff <= swipeThresholdInverse)) {
+	else if((touchYDiff < 0)) {
 		direction = directions.up;
 	};
 
