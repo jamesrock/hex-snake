@@ -73,14 +73,6 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-h2 {
-	font-style: italic;
-	font-weight: 900;
-	font-size: 36px;
-	line-height: 1;
-	text-transform: uppercase;
-}
-
 canvas {
 	display: block;
 }
@@ -114,6 +106,13 @@ canvas {
 		gap: 30px;
 		text-shadow: 0 0 10px white;
 		line-height: 1;
+	}
+
+	h1 {
+		font-style: italic;
+		font-weight: 900;
+		font-size: 38px;
+		text-transform: uppercase;
 	}
 
 	.score {
