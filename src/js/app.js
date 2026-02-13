@@ -12,6 +12,23 @@ import {
 	limit
 } from '@jamesrock/rockjs';
 
+const scaler = new Scaler(2);
+const getMaxSize = () => {
+	
+	const constraint = 1000;
+	const h = Math.floor(limit(window.innerHeight, constraint) / 59);
+	const w = Math.floor(limit(window.innerWidth, constraint) / 39);
+
+	if(w>h) {
+		return h;
+	};
+
+	return w;
+
+};
+
+// console.log(getMaxSize());
+
 class Food {
 	constructor(x, y, color = 'grey') {
 
@@ -39,12 +56,9 @@ class Snake extends GameBase {
 
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
-
-		// this.node.style.width = `${scaler.deflate(this.canvas.width)}px`;
-		// this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
-		this.node.style.aspectRatio = `${this.width}/${this.height}`;
+		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
+		
 		this.node.style.borderWidth = `${scaler.deflate(this.size)}px`;
-
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
 
@@ -290,8 +304,7 @@ class Snake extends GameBase {
 	};
 	width = 35;
 	height = 55;
-	// size = scaler.inflate(10);
-	size = scaler.inflate(Math.floor(limit(window.innerWidth, 1000) / 39));
+	size = scaler.inflate(getMaxSize());
 };
 
 const 
@@ -314,9 +327,8 @@ opposites = {
 	up: 'down',
 	down: 'up'
 },
-rounder = new Rounder(60),
-scaler = new Scaler(2),
 directionsArray = Object.keys(directionsKeyMap),
+rounder = new Rounder(60),
 snake = window.snake = new Snake();
 
 let 
