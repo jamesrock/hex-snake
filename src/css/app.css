@@ -120,6 +120,10 @@ canvas {
 		gap: 30px;
 		text-shadow: 0 0 10px white;
 		line-height: 1;
+
+		@media (min-width: 800px) {
+			transform: scale(2);
+		}
 	}
 
 	.score {
