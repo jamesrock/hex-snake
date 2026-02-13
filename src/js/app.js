@@ -186,7 +186,7 @@ class Snake {
 		this.segments.push(seg);
 
 		if(this.checkCollision(x, y) || this.checkFood(x, y)) {
-			this.setGameOver(true);
+			this.showGameOverScreen(true);
 		};
 
 		return this;
@@ -225,7 +225,7 @@ class Snake {
 		];
 		this.color = 'black';
 		this.poison = pluckRandom(this.colors);
-		this.setGameOver(false);
+		this.gameOver = false;
 		this.makeFood();
 		this.draw();
 		
@@ -280,20 +280,18 @@ class Snake {
 		};
 
 	};
-	setGameOver(a) {
+	showGameOverScreen() {
 
-		if(a) {
-			const best = storage.get('best') || 0;
-			storage.set('best', this.eaten > best ? this.eaten : best);
-			this.gameOverNode.innerHTML = `\
-				<h2>GAME OVER!</h2>\
-				<p class="score">${this.eaten}</p>\
-				<p class="continue">Tap to continue.</p>\
-				<p class="best">Best: ${storage.get('best')}</p>`;
-		};
+		const best = storage.get('best') || 0;
+		storage.set('best', this.eaten > best ? this.eaten : best);
 
-		this.gameOver = a;
-		this.gameOverNode.dataset.active = a;
+		this.gameOverNode.innerHTML = `\
+			<h2>GAME OVER!</h2>\
+			<p class="score">${this.eaten}</p>\
+			<p class="continue">Tap to continue.</p>\
+			<p class="best">Best: ${storage.get('best')}</p>`;
+		this.gameOver = true;
+		this.gameOverNode.dataset.active = true;
 		return this;
 
 	};
