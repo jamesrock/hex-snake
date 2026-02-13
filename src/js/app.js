@@ -352,11 +352,11 @@ snake.renderTo(body);
 
 document.addEventListener('keydown', (e) => {
 		
-	if(isValidKey(e.key, directionsArray)) {
+	if(isValidKey(e.code, directionsArray)) {
 		snake.turn(directionsKeyMap[e.key]);
 	};
 
-	if(snake.gameOver && isValidKey(e.key, [' '])) {
+	if(snake.gameOver && isValidKey(e.code, ['Space'])) {
 		snake.reset();
 	};
 
