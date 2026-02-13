@@ -48,7 +48,9 @@ class Snake {
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
 
-		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
+		// this.node.style.width = `${scaler.deflate(this.canvas.width)}px`;
+		// this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
+		this.node.style.aspectRatio = `${this.width}/${this.height}`;
 
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
@@ -316,7 +318,7 @@ class Snake {
 	width = 35;
 	height = 55;
 	// size = scaler.inflate(10);
-	size = scaler.inflate(Math.floor(limit(window.innerHeight, 1000) / 59));
+	size = scaler.inflate(Math.floor(limit(window.innerWidth, 1000) / 39));
 };
 
 const 
