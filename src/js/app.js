@@ -51,6 +51,7 @@ class Snake {
 		// this.node.style.width = `${scaler.deflate(this.canvas.width)}px`;
 		// this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 		this.node.style.aspectRatio = `${this.width}/${this.height}`;
+		this.node.style.borderWidth = `${scaler.deflate(this.size)}px`;
 
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
