@@ -27,8 +27,8 @@
 }
 
 :root {
-	--background: floralwhite;
-	--foreground: #333;
+	--background: beige;
+	--foreground: #555;
 }
 
 * {
@@ -107,25 +107,6 @@ canvas {
 
 	.best {
 		font-weight: 600;
-	}
-
-	.score,
-	.best,
-	.continue,
-	h2 {
-		position: relative;
-		&:before {
-			display: block;
-			/* content: ''; */
-			border-radius: 100%;
-			background-image: radial-gradient(white, transparent 50%);
-			position: absolute;
-			z-index: -1;
-			top: -50px;
-			left: -50px;
-			right: -50px;
-			bottom: -50px;
-		}
 	}
 
 	&[data-active="false"] {
