@@ -289,10 +289,14 @@ class Snake {
 		this.storage.set('best', this.eaten > best ? this.eaten : best);
 
 		this.gameOverNode.innerHTML = `\
-			<h2>GAME OVER!</h2>\
-			<p class="score">${this.eaten}</p>\
-			<p class="continue">Tap to continue.</p>\
-			<p class="best">Best: ${this.storage.get('best')}</p>`;
+			<div class="game-over-body">\
+				<h2>Game over!</h2>\
+				<div>\
+					<p class="score">${this.eaten}</p>\
+					<p class="best">Best: ${this.storage.get('best')}</p>\
+				</div>\
+				<p class="continue">Tap to continue.</p>\
+			</div>`;
 		this.gameOver = true;
 		this.gameOverNode.dataset.active = true;
 

@@ -26,6 +26,13 @@
 	src: url('/fonts/Poppins-ExtraBold.ttf');
 }
 
+@font-face {
+	font-family: 'Poppins';
+	font-weight: 900;
+	font-style: italic;
+	src: url('/fonts/Poppins-BlackItalic.ttf');
+}
+
 :root {
 	--background: beige;
 	--foreground: #555;
@@ -53,20 +60,25 @@ body {
 	background-color: var(--background);
 	color: var(--foreground);
 	font-family: 'Poppins';
-	font-weight: 500;
+	font-weight: 700;
 	font-size: 18px;
 	text-align: center;
+	letter-spacing: 1px;
+	text-transform: uppercase;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	height: 100%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 h2 {
 	font-style: italic;
 	font-weight: 900;
-	font-size: 34px;
+	font-size: 36px;
 	line-height: 1;
+	text-transform: uppercase;
 }
 
 canvas {
@@ -96,8 +108,14 @@ canvas {
 	backdrop-filter: blur(5px);
 	gap: 10px;
 	padding: 20px;
-	background-image: radial-gradient(rgba(255, 250, 240, 1), transparent 50%);
 	transition: opacity 0.2s;
+	font-size: 22px;
+
+	.game-over-body {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
 
 	.score {
 		font-size: 60px;
@@ -105,8 +123,8 @@ canvas {
 		line-height: 1;
 	}
 
-	.best {
-		font-weight: 600;
+	.continue {
+		font-size: 18px;
 	}
 
 	&[data-active="false"] {
