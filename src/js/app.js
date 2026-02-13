@@ -233,10 +233,10 @@ class Snake {
 		this.gameOverNode.dataset.active = false;
 		
 		this.node.style.setProperty('--poison', this.poison);
-		this.node.dataset.preview = 'true';
+		this.node.dataset.preview = true;
 
 		setTimeout(() => {
-			this.node.dataset.preview = 'false';
+			this.node.dataset.preview = false;
 			this.update();
 		}, 2000);
 
@@ -295,7 +295,7 @@ class Snake {
 					<p class="score">${this.eaten}</p>\
 					<p class="best">Best: ${this.storage.get('best')}</p>\
 				</div>\
-				<p class="continue">Tap to continue.</p>\
+				<p class="continue">Tap to continue</p>\
 			</div>`;
 		this.gameOver = true;
 		this.gameOverNode.dataset.active = true;
