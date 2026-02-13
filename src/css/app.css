@@ -107,21 +107,25 @@ canvas {
 	flex-direction: column;
 	padding: 20px;
 	transition: opacity 0.2s;
-	font-size: 22px;
 	backdrop-filter: blur(5px);
 	background-image: linear-gradient(transparent, white, transparent);
 
 	.game-over-body {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 30px;
 		text-shadow: 0 0 10px white;
+		line-height: 1;
 	}
 
 	.score {
 		font-size: 60px;
 		font-weight: 600;
-		line-height: 1;
+		padding-bottom: 5px;
+	}
+
+	.best {
+		font-size: 20px;
 	}
 
 	.continue {
