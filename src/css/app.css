@@ -96,6 +96,11 @@ canvas {
 	transition: opacity 0.2s;
 	backdrop-filter: blur(5px);
 	background-image: linear-gradient(transparent, white, transparent);
+	font-size: 10px;
+
+	[data-scale="true"] & {
+		font-size: 20px;
+	}
 
 	.game-over-body {
 		display: flex;
@@ -108,22 +113,22 @@ canvas {
 	h1 {
 		font-style: italic;
 		font-weight: 900;
-		font-size: 38px;
+		font-size: 3.8em;
 		text-transform: uppercase;
 	}
 
 	.score {
-		font-size: 60px;
+		font-size: 6em;
 		font-weight: 600;
 		padding-bottom: 5px;
 	}
 
 	.best {
-		font-size: 20px;
+		font-size: 2em;
 	}
 
 	.continue {
-		font-size: 18px;
+		font-size: 1.8em;
 	}
 
 	&[data-active="false"] {

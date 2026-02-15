@@ -9,28 +9,11 @@ import {
 	getRandom,
 	pluckFirst,
 	pluckRandom,
-	limit
 } from '@jamesrock/rockjs';
 
 const scaler = new Scaler(2);
-const getMaxSize = (baseWidth, baseHeight) => {
-	
-	const constraint = 1000;
-	const h = Math.floor(limit(window.innerHeight, constraint) / (baseHeight+4));
-	const w = Math.floor(limit(window.innerWidth, constraint) / (baseWidth+4));
 
-	let out = w;
-
-	if(w>h) {
-		out = h;
-	};
-
-	// return limit(out, 20);
-	return out;
-
-};
-
-const canDouble = (baseWidth, baseHeight) => {
+const canScale = (baseWidth, baseHeight) => {
 	
 	return scaler.inflate(baseWidth)<window.innerWidth && scaler.inflate(baseHeight)<window.innerHeight;
 
@@ -63,6 +46,11 @@ class Snake extends GameBase {
 
 		super('snake');
 
+		if(canScale(scaler.deflate(this.inflate(this.width)), scaler.deflate(this.inflate(this.height)))) {
+			this.node.dataset.scale = 'true';
+			this.size = scaler.inflate(this.size);
+		};
+
 		this.canvas.width = this.inflate(this.width);
 		this.canvas.height = this.inflate(this.height);
 		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
@@ -70,10 +58,6 @@ class Snake extends GameBase {
 		this.node.style.borderWidth = `${scaler.deflate(this.size)}px`;
 		this.node.appendChild(this.canvas);
 		this.node.appendChild(this.gameOverNode);
-
-		if(canDouble(scaler.deflate(this.canvas.width), scaler.deflate(this.canvas.height))) {
-			this.node.style.transform = 'scale(2)';
-		};
 
 		this.reset();
 		this.draw();
@@ -355,7 +339,6 @@ class Snake extends GameBase {
 	};
 	width = 30;
 	height = 50;
-	// size = scaler.inflate(getMaxSize(30, 50));
 	size = scaler.inflate(10);
 };
 
