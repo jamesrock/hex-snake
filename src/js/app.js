@@ -3,6 +3,7 @@ import {
 	Rounder,
 	Scaler,
 	GameBase,
+	setDocumentHeight,
 	isValidKey,
 	makeArray,
 	random,
@@ -10,6 +11,8 @@ import {
 	pluckFirst,
 	pluckRandom,
 } from '@jamesrock/rockjs';
+
+setDocumentHeight();
 
 const scaler = new Scaler(2);
 

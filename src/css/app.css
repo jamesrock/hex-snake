@@ -51,10 +51,6 @@
 	touch-action: none;
 }
 
-html {
-	height: 100svh;
-}
-
 body {
 	background-color: var(--background);
 	color: var(--foreground);
