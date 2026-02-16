@@ -61,10 +61,10 @@ class Snake extends GameBase {
 
 		this.showGameOverScreen();
 		this.reset();
-		this.draw();
+		this.render();
 
 	};
-	draw() {
+	render() {
 
 		this.canvas.width = this.inflate(this.width);
 
@@ -81,6 +81,8 @@ class Snake extends GameBase {
 		this.animationFrame = requestAnimationFrame(() => {
 			this.draw();
 		});
+
+		return this;
 
 	};
 	update() {
@@ -107,7 +109,6 @@ class Snake extends GameBase {
 		};
 
 		this.move(x, y);
-		// this.draw();
 		
 		clearTimeout(this.timer);
 
@@ -241,7 +242,6 @@ class Snake extends GameBase {
 		this.gameOver = false;
 		this.dying = false;
 		this.makeFood();
-		// this.draw();
 
 		this.gameOverNode.dataset.active = false;
 		
@@ -318,8 +318,6 @@ class Snake extends GameBase {
 			setTimeout(() => {
 
 				this.color = invisible ? 'white' : color;
-
-				// this.draw();
 
 				invisible = !invisible;
 
