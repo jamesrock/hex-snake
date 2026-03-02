@@ -17,6 +17,23 @@ import { mazes } from './mazes';
 
 setDocumentHeight();
 
+class Sounds {
+  constructor(url) {
+
+    this.url = url;
+
+  };
+  play() {
+
+    const source = new Audio(this.url);
+
+    source.addEventListener('canplaythrough', (event) => {
+      source.play();
+    });
+
+  };
+};
+
 const scaler = new Scaler(2);
 
 const mapToGrid = (pixels, w) => {
@@ -62,7 +79,7 @@ const makeCoins = (w, h) => {
 };
 
 class Wall {
-	constructor(x, y, color = 'black') {
+	constructor(x, y, color = 'deeppink') {
 
 		this.x = x;
 		this.y = y;
@@ -72,7 +89,17 @@ class Wall {
 };
 
 class Coin {
-	constructor(x, y, color = 'red') {
+	constructor(x, y, color = 'white') {
+
+		this.x = x;
+		this.y = y;
+		this.color = color;
+
+	};
+};
+
+class Man {
+	constructor(x, y, color = 'white') {
 
 		this.x = x;
 		this.y = y;
@@ -110,7 +137,8 @@ class Maze extends GameBase {
 		this.width = this.props.width;
 		this.height = this.props.height;
 		// this.size = scaler.inflate(targetWidth / this.props.width);
-		this.size = scaler.inflate(50);
+		// this.size = scaler.inflate(60);
+		this.size = scaler.inflate(16);
 
 		const grid = mapToGrid(data, this.props.width);
 
@@ -145,30 +173,30 @@ class Maze extends GameBase {
 		// this.canvas.width = this.inflate(this.width);
 		this.canvas.width = scaler.inflate(window.innerWidth);
 
-		this.ctx.fillStyle = 'white';
-		this.ctx.fillRect(this.inflate(this.x), this.inflate(this.y), this.inflate(this.width), this.inflate(this.height));
+		// this.ctx.fillStyle = '#222';
+		// this.ctx.fillRect(this.inflate(this.x), this.inflate(this.y), this.inflate(this.width), this.inflate(this.height));
 
-		this.walls.forEach((seg) => {
-			this.ctx.fillStyle = seg.color;
-			this.ctx.fillRect(this.inflate(seg.x + this.x), this.inflate(seg.y + this.y), this.size, this.size);
+		this.walls.forEach(({x, y, color}) => {
+			this.ctx.fillStyle = color;
+			this.ctx.fillRect(this.inflate(x + this.x), this.inflate(y + this.y), this.size, this.size);
 		});
 
-		this.coins.forEach((coin) => {
-			this.ctx.fillStyle = coin.color;
+		this.coins.forEach(({x, y, color}) => {
+			this.ctx.fillStyle = color;
 			this.ctx.beginPath();
-      this.ctx.arc(this.inflate((coin.x + 1) + this.x), this.inflate((coin.y + 1) + this.y), this.size-20, 0, 2 * Math.PI);
+      this.ctx.arc(this.inflate((x + 1) + this.x), this.inflate((y + 1) + this.y), this.size*0.6, 0, 2 * Math.PI);
       this.ctx.fill();
-			// this.ctx.fillRect(this.inflate(coin.x + this.x), this.inflate(coin.y + this.y), this.size, this.size);
+			// this.ctx.fillRect(this.inflate(x + this.x), this.inflate(y + this.y), this.size, this.size);
 		});
 
-		this.toSquare().forEach(([x, y]) => {
-			this.ctx.fillStyle = 'magenta';
-			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size, this.size);
+		this.men.forEach(({x, y, color}) => {
+			this.ctx.fillStyle = color;
+			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size*2, this.size*2);
 		});
 
-		this.animationFrame = requestAnimationFrame(() => {
-			this.render();
-		});
+		// this.animationFrame = requestAnimationFrame(() => {
+		// 	this.render();
+		// });
 
 		return this;
 
@@ -176,27 +204,17 @@ class Maze extends GameBase {
 	reset() {
 
 		const onePixel = scaler.deflate(this.size);
-		const numberOfXPixels = (window.innerWidth / onePixel);
-		const numberOfYPixels = (window.innerHeight / onePixel);
+		const numberOfXPixels = floorTo(window.innerWidth / onePixel);
+		const numberOfYPixels = floorTo(window.innerHeight / onePixel);
 
-		this.x = floorTo((numberOfXPixels / 2) - 1);
-		this.y = floorTo((numberOfYPixels / 2) - 1);
+		this.x = floorTo((numberOfXPixels / 2) - 2);
+		this.y = floorTo((numberOfYPixels / 2));
 
 		// this.x = 20;
 		// this.y = 20;
 
-		this.manX = (this.x + 2);
-		this.manY = (this.y - 2);
+		this.men = [new Man(this.x + 1, this.y - 3)];
 		this.score = 0;
-		this.colors = [
-			'#F8C800', // yellow
-			'#EF0040', // red
-			'#FF00FF', // pink
-			'#00E000', // green
-			'#9C00FF', // purple
-			'#25CCFD', // blue
-			'#FF7F00', // orange
-		];
 		this.gameOver = false;
 
 		this.gameOverNode.dataset.active = false;
@@ -204,27 +222,16 @@ class Maze extends GameBase {
 		return this;
 
 	};
-	toSquare() {
-
-		const x = this.manX;
-		const y = this.manY;
-
-	  return [
-			[x-1, y-1],
-			[x-1, y],
-			[x, y-1],
-			[x, y]
-		];
-
-	};
 	checkCoins() {
 
-		const coin = this.coins.find((c) => (c.x + this.x) === (this.manX - 1) && (c.y + this.y) === (this.manY - 1));
+		const coin = this.coins.find((c) => (c.x + this.x) === (this.men[0].x) && (c.y + this.y) === (this.men[0].y));
 
 		if(coin) {
 
 			this.coins.splice(this.coins.indexOf(coin), 1);
+			// coin.color = 'magenta';
 			this.score ++;
+			// sound.play();
 
 			this.updateScore();
 
@@ -254,6 +261,7 @@ class Maze extends GameBase {
       break;
 		};
 
+		this.render();
 		this.checkCoins();
 
 		return this;
@@ -261,8 +269,7 @@ class Maze extends GameBase {
 	};
 	canMove(direction) {
 
-    let x = this.manX;
-    let y = this.manY;
+    let {x, y} = this.men[0];
 
     switch(direction) {
       case 'up':
@@ -280,10 +287,10 @@ class Maze extends GameBase {
 		};
 
     return ![
-			`x${x-1}y${y-1}`,
-			`x${x-1}y${y}`,
-			`x${x}y${y-1}`,
-			`x${x}y${y}`,
+			`x${x}y${y}`, // top left
+			`x${x+1}y${y}`, // top right
+			`x${x}y${y+1}`, // bottom right
+			`x${x+1}y${y+1}`, // bottom left
 		].map((q) => this.checkForWall(q)).includes(true);
 
 	};
@@ -325,6 +332,7 @@ directionsKeyMap = {
 	ArrowRight: 'right',
 	ArrowDown: 'down'
 },
+sound = new Sounds('/audio/point.mp3'),
 directionsArray = Object.keys(directionsKeyMap),
 rounder = new Rounder(20),
 mode = 'hard',
