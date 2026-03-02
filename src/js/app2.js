@@ -8,7 +8,9 @@ import {
 	makeArray,
 	random,
 	getRandom,
+	makeNode,
 	getLast,
+	floorTo
 } from '@jamesrock/rockjs';
 import { Maker } from './Maker';
 import { mazes } from './mazes';
@@ -17,18 +19,12 @@ setDocumentHeight();
 
 const scaler = new Scaler(2);
 
-const canScale = (baseWidth, baseHeight) => {
-
-	return scaler.inflate(baseWidth)<window.innerWidth && scaler.inflate(baseHeight)<window.innerHeight;
-
-};
-
 const mapToGrid = (pixels, w) => {
   let x = 0;
   let y = 0;
   return pixels.map((a, index) => {
 
-    const bob = [!!a, x, y, index];
+    const bob = [a, x, y, index];
 
     if(x > 0 && x%(w-1)===0) {
       x = 0;
@@ -39,6 +35,28 @@ const mapToGrid = (pixels, w) => {
     };
 
     return bob;
+
+  });
+};
+
+const makeCoins = (w, h) => {
+  let x = 1;
+  let y = 1;
+  const limit = ((w-1)/3);
+  const rows = ((h-1)/3);
+  return makeArray(limit*rows).map((index) => {
+
+    const coin = new Coin(x, y);
+
+    if(x > 0 && x%(w-3)===0) {
+      x = 1;
+      y += 3;
+    }
+    else {
+      x += 3;
+    };
+
+    return coin;
 
   });
 };
@@ -54,7 +72,7 @@ class Wall {
 };
 
 class Coin {
-	constructor(x, y, color = 'gold') {
+	constructor(x, y, color = 'red') {
 
 		this.x = x;
 		this.y = y;
@@ -67,13 +85,6 @@ class Maze extends GameBase {
 	constructor(data, mode = 'easy') {
 
 		super('maze');
-
-		if(canScale(scaler.deflate(this.inflate(this.width)), scaler.deflate(this.inflate(this.height)))) {
-			this.node.dataset.scale = 'true';
-			this.size = scaler.inflate(this.size);
-		};
-
-		const targetWidth = 500;
 
 		this.settings = {
       'easy': {
@@ -99,12 +110,15 @@ class Maze extends GameBase {
 		this.width = this.props.width;
 		this.height = this.props.height;
 		// this.size = scaler.inflate(targetWidth / this.props.width);
-		this.size = scaler.inflate(40);
+		this.size = scaler.inflate(50);
 
 		const grid = mapToGrid(data, this.props.width);
 
 		this.data = data;
-		this.walls = grid.filter((a) => a[0]).map(([isWall, x, y]) => new Wall(x, y));
+		this.walls = grid.filter((a) => a[0]===1).map(([isWall, x, y]) => new Wall(x, y));
+		// this.coins = grid.filter((a) => a[0]===2).map(([isWall, x, y]) => new Coin(x, y));
+		this.coins = makeCoins(this.props.width, this.props.height);
+		this.countCount = this.coins.length;
 
 		// this.canvas.width = this.inflate(this.width);
 		this.canvas.width = scaler.inflate(window.innerWidth);
@@ -112,14 +126,16 @@ class Maze extends GameBase {
 		this.canvas.height = scaler.inflate(window.innerHeight);
 		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 
-		console.log(window.innerWidth, window.innerHeight);
+		this.scoreNode = makeNode('div', 'stats');
 
 		this.node.appendChild(this.canvas);
+		this.node.appendChild(this.scoreNode);
 		this.node.appendChild(this.gameOverNode);
 
 		this.showGameOverScreen();
 		this.reset();
 		this.render();
+		this.updateScore();
 
 		console.log(this);
 
@@ -129,6 +145,9 @@ class Maze extends GameBase {
 		// this.canvas.width = this.inflate(this.width);
 		this.canvas.width = scaler.inflate(window.innerWidth);
 
+		this.ctx.fillStyle = 'white';
+		this.ctx.fillRect(this.inflate(this.x), this.inflate(this.y), this.inflate(this.width), this.inflate(this.height));
+
 		this.walls.forEach((seg) => {
 			this.ctx.fillStyle = seg.color;
 			this.ctx.fillRect(this.inflate(seg.x + this.x), this.inflate(seg.y + this.y), this.size, this.size);
@@ -136,7 +155,10 @@ class Maze extends GameBase {
 
 		this.coins.forEach((coin) => {
 			this.ctx.fillStyle = coin.color;
-			this.ctx.fillRect(this.inflate(coin.x), this.inflate(coin.y), this.size, this.size);
+			this.ctx.beginPath();
+      this.ctx.arc(this.inflate((coin.x + 1) + this.x), this.inflate((coin.y + 1) + this.y), this.size-20, 0, 2 * Math.PI);
+      this.ctx.fill();
+			// this.ctx.fillRect(this.inflate(coin.x + this.x), this.inflate(coin.y + this.y), this.size, this.size);
 		});
 
 		this.toSquare().forEach(([x, y]) => {
@@ -151,11 +173,35 @@ class Maze extends GameBase {
 		return this;
 
 	};
-	update() {
+	reset() {
 
-		if(this.gameOver) {
-			return;
-		};
+		const onePixel = scaler.deflate(this.size);
+		const numberOfXPixels = (window.innerWidth / onePixel);
+		const numberOfYPixels = (window.innerHeight / onePixel);
+
+		this.x = floorTo((numberOfXPixels / 2) - 1);
+		this.y = floorTo((numberOfYPixels / 2) - 1);
+
+		// this.x = 20;
+		// this.y = 20;
+
+		this.manX = (this.x + 2);
+		this.manY = (this.y - 2);
+		this.score = 0;
+		this.colors = [
+			'#F8C800', // yellow
+			'#EF0040', // red
+			'#FF00FF', // pink
+			'#00E000', // green
+			'#9C00FF', // purple
+			'#25CCFD', // blue
+			'#FF7F00', // orange
+		];
+		this.gameOver = false;
+
+		this.gameOverNode.dataset.active = false;
+
+		return this;
 
 	};
 	toSquare() {
@@ -171,39 +217,16 @@ class Maze extends GameBase {
 		];
 
 	};
-	checkCollision(x, y) {
+	checkCoins() {
 
-		let collision = false;
+		const coin = this.coins.find((c) => (c.x + this.x) === (this.manX - 1) && (c.y + this.y) === (this.manY - 1));
 
-		for(var i = 1; i < this.walls.length-2; i++) {
-			const {x: sX, y: sY} = this.walls[i];
-			if(sX === x && sY === y) {
-				collision = true;
-			};
-		};
+		if(coin) {
 
-		if((x === -1) || (y === -1) || (x === this.width) || (y === this.height)) {
-			collision = true;
-		};
-
-		return collision;
-
-	};
-	checkCoins(x, y) {
-
-		const food = this.coins.find((food) => food.x === x && food.y === y);
-
-		if(food) {
-
-			this.coins.splice(this.coins.indexOf(food), 1);
-			this.color = food.color;
-
-			if(food.color===this.poison) {
-				return true;
-			};
-
+			this.coins.splice(this.coins.indexOf(coin), 1);
 			this.score ++;
-			this.makeCoins(1);
+
+			this.updateScore();
 
 		};
 
@@ -231,7 +254,7 @@ class Maze extends GameBase {
       break;
 		};
 
-		// this.checkCoins(x, y);
+		this.checkCoins();
 
 		return this;
 
@@ -270,31 +293,6 @@ class Maze extends GameBase {
 		return this;
 
 	};
-	reset() {
-
-		this.score = 0;
-		this.x = 10;
-		this.y = 10;
-		this.manX = 12;
-		this.manY = 11;
-		this.coins = [];
-		this.colors = [
-			'#F8C800', // yellow
-			'#EF0040', // red
-			'#FF00FF', // pink
-			'#00E000', // green
-			'#9C00FF', // purple
-			'#25CCFD', // blue
-			'#FF7F00', // orange
-		];
-		this.gameOver = false;
-		// this.makeCoins();
-
-		this.gameOverNode.dataset.active = false;
-
-		return this;
-
-	};
 	inflate(a) {
 
 		return (a * this.size);
@@ -305,62 +303,15 @@ class Maze extends GameBase {
 		return this.walls.map((wall) => (`x${wall.x+this.x}y${wall.y+this.y}`)).includes(q);
 
 	};
-	checkForFood(q) {
-
-		return this.coins.map((coin) => (`x${coin.x}y${coin.y}`)).includes(q);
-
-	};
-	query(q) {
-
-		return this.checkForWall(q)||this.checkForFood(q);
-
-	};
-	makeCoins(count = 50) {
-
-		makeArray(count).forEach(() => {
-
-			const numberOfPoison = this.coins.filter((food) => food.color === this.poison).length;
-			const {x, y} = this.getRandomXAndY();
-
-			this.coins.push(new Coin(x, y, getRandom(numberOfPoison < 25 ? [this.poison, ...this.colors] : this.colors)));
-
-		});
-		return this;
-
-	};
-	getRandomXAndY() {
-
-		let
-		width = this.width-2,
-		height = this.height-2,
-		x = random(1, width),
-		y = random(1, height);
-
-		while([
-			`${x}${y}`,
-			`${x}${y+1}`,
-			`${x}${y-1}`,
-			`${x-1}${y}`,
-			`${x-1}${y+1}`,
-			`${x-1}${y-1}`,
-			`${x+1}${y}`,
-			`${x+1}${y+1}`,
-			`${x+1}${y-1}`,
-		].map((q) => this.query(q)).includes(true)) {
-			// console.log('clash');
-			x = random(1, width);
-			y = random(1, height);
-		};
-
-		return {
-			x,
-			y
-		};
-
-	};
 	stop() {
 
 		cancelAnimationFrame(this.animationFrame);
+		return this;
+
+	};
+	updateScore() {
+
+	  // this.scoreNode.innerHTML = `${this.score}/${this.countCount}`;
 		return this;
 
 	};
@@ -383,7 +334,7 @@ let touch = null;
 let xMovement = 0;
 let yMovement = 0;
 
-// snake.renderTo(body);
+snake.renderTo(body);
 
 document.addEventListener('keydown', (e) => {
 
@@ -438,14 +389,12 @@ document.addEventListener('touchmove', (e) => {
 document.addEventListener('drag-up', () => {
 
 	snake.move('up');
-	console.log('up');
 
 });
 
 document.addEventListener('drag-down', () => {
 
 	snake.move('down');
-	console.log('up');
 
 });
 
@@ -461,4 +410,4 @@ document.addEventListener('drag-left', () => {
 
 });
 
-window.maker = new Maker();
+// window.maker = new Maker();

@@ -192,3 +192,12 @@ button.copy {
   border: 0;
   padding: 5px 15px;
 }
+
+.stats {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  font-size: 80px;
+  font-family: monospace;
+  letter-spacing: -2px;
+}
