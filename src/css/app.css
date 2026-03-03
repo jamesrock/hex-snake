@@ -170,18 +170,27 @@ input[type="number"] {
     &[data-state="wall"] {
       background-color: black;
     }
-    &[data-state="coin"] {
-      background-color: gold;
+    &[data-state="door"] {
+      background-color: red;
     }
   }
 }
 
 .inputs {
   padding-top: 10px;
+  position: absolute;
+  background-color: white;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.inputs-top,
+.inputs-bottom {
   display: flex;
   align-items: center;
   gap: 5px;
-  position: absolute;
+
   select {
     padding: 0 10px;
   }

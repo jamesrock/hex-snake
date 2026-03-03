@@ -177,9 +177,8 @@ class Maze extends GameBase {
 		const grid = mapToGrid(data, this.props.width);
 
 		this.data = data;
-		this.walls = grid.filter((a) => a[0]===1).map(([type, x, y]) => new Wall(x, y));
-		this.map = this.walls.map((wall) => (`x${wall.x+this.x}y${wall.y+this.y}`));
-		this.doors = grid.filter((a) => a[0]===2).map(([isWall, x, y]) => new Door(x, y));
+		this.walls = grid.filter(([type]) => type===1).map(([type, x, y]) => new Wall(x, y));
+		this.doors = grid.filter(([type]) => type===2).map(([type, x, y]) => new Door(x, y));
 		this.coins = makeCoins(this.props.width, this.props.height);
 		this.countCount = this.coins.length;
 

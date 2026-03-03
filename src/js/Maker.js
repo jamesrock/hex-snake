@@ -8,6 +8,8 @@ import {
 } from '@jamesrock/rockjs';
 import { mazes } from './mazes';
 
+const body = document.body;
+
 const makeOpacitySlider = () => {
   const node = makeInput(0, 'range');
   node.min = 0;
@@ -79,20 +81,18 @@ class Grid extends DisplayObject {
     'door-no': 0
   };
   stateAttributeMap = ['empty', 'wall', 'door'];
-  guides = makeArray(25).map((value) => value * 3);
+  guides = makeArray(55).map((value) => value * 3);
   pixels = [];
 };
 
 export class Maker {
   constructor() {
 
-    const body = document.body;
-
     const settings = {
       '100': {
         xPos: 3,
         yPos: 38,
-        size: 1475,
+        size: 1476,
         pixelSize: 20,
         width: 37,
         height: 49
@@ -100,7 +100,7 @@ export class Maker {
       '200': {
         xPos: 3,
         yPos: 37,
-        size: 1405,
+        size: 1406,
         pixelSize: 15,
         width: 46,
         height: 61
@@ -115,56 +115,58 @@ export class Maker {
       },
       '400': {
         xPos: 4,
-        yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        yPos: 37,
+        size: 1398,
+        pixelSize: 10,
+        width: 67,
+        height: 88
       },
       '500': {
         xPos: 4,
-        yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        yPos: 34,
+        size: 1306,
+        pixelSize: 8,
+        width: 76,
+        height: 100
       },
       '600': {
         xPos: 4,
-        yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        yPos: 34,
+        size: 1300,
+        pixelSize: 7,
+        width: 85,
+        height: 112
       },
       '700': {
         xPos: 4,
-        yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        yPos: 34,
+        size: 1290,
+        pixelSize: 6,
+        width: 97,
+        height: 127
       },
       '800': {
         xPos: 4,
-        yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        yPos: 37,
+        size: 1414,
+        pixelSize: 6,
+        width: 106,
+        height: 139
       },
       '900': {
-        xPos: 4,
+        xPos: 3,
         yPos: 36,
-        size: 1370,
-        pixelSize: 12,
-        width: 55,
-        height: 73
+        size: 1346,
+        pixelSize: 5,
+        width: 115,
+        height: 154
       },
     };
 
     const maker = makeNode('div', 'maker');
     const inputs = makeNode('div', 'inputs');
+    const inputsTop = makeNode('div', 'inputs-top');
+    const inputsBottom = makeNode('div', 'inputs-bottom');
     const target = makeNode('div', 'grid-target');
     const difficulty = makeSelect(Object.keys(settings).map((a) => [a, a]));
     const mode = makeSelect([['add wall', 'wall-yes'], ['remove wall', 'wall-no'], ['add door', 'door-yes'], ['remove door', 'door-no']]);
@@ -174,7 +176,7 @@ export class Maker {
       'door-yes': 'guide',
       'door-no': 'guide'
     };
-    const set = makeSelect(makeArray(10).map((a) => [`#${a + 1}`, a]));
+    const set = makeSelect(makeArray(11).map((a) => [`#${a + 1}`, a]));
     const copyButton = makeButton('copy', 'copy');
     let props = settings[difficulty.value];
     const xPos = makeInput(props.xPos);
@@ -185,6 +187,8 @@ export class Maker {
     const height = makeInput(props.height);
     const opacity = makeOpacitySlider();
     let grid = null;
+
+    size.step = 2;
 
     const changeHandler = () => {
       body.style.backgroundImage = `url(/mazes/maze-${Number(set.value) + 1}-${difficulty.value}.png)`;
@@ -215,13 +219,16 @@ export class Maker {
     });
 
     [set, difficulty, mode, copyButton, opacity].forEach((input) => {
-      inputs.append(input);
+      inputsTop.append(input);
     });
 
-    // [xPos, yPos, size, pixelSize, width, height].forEach((input) => {
-    //   input.addEventListener('input', changeHandler);
-    //   inputs.append(input);
-    // });
+    [xPos, yPos, size, pixelSize, width, height].forEach((input) => {
+      input.addEventListener('input', changeHandler);
+      inputsBottom.append(input);
+    });
+
+    inputs.append(inputsTop);
+    // inputs.append(inputsBottom);
 
     maker.append(target);
     maker.append(inputs);
