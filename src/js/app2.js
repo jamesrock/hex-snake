@@ -128,21 +128,6 @@ class Maze extends GameBase {
         width: 46,
         height: 61
       },
-      '700': {
-        pixelSize: 10,
-        width: 55,
-        height: 73
-      },
-      '800': {
-        pixelSize: 12,
-        width: 46,
-        height: 61
-      },
-      '900': {
-        pixelSize: 10,
-        width: 55,
-        height: 73
-      },
     };
 
 		this.mode = mode;

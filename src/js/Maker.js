@@ -191,30 +191,6 @@ export class Maker {
         width: 85,
         height: 112
       },
-      '700': {
-        xPos: 4,
-        yPos: 34,
-        size: 1290,
-        pixelSize: 6,
-        width: 97,
-        height: 127
-      },
-      '800': {
-        xPos: 4,
-        yPos: 37,
-        size: 1414,
-        pixelSize: 6,
-        width: 106,
-        height: 139
-      },
-      '900': {
-        xPos: 3,
-        yPos: 36,
-        size: 1346,
-        pixelSize: 5,
-        width: 115,
-        height: 154
-      },
     };
 
     const maker = makeNode('div', 'maker');
@@ -230,7 +206,7 @@ export class Maker {
       'door-yes': 'guide',
       'door-no': 'guide'
     };
-    const set = makeSelect(makeArray(11).map((a) => [`#${a + 1}`, a]));
+    const set = makeSelect(makeArray(10).map((a) => [`#${a + 1}`, a]));
     const copyButton = makeButton('copy', 'copy');
     let props = settings[difficulty.value];
     const xPos = makeInput(props.xPos);

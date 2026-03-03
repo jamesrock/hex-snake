@@ -40,8 +40,5 @@ const d300 = [
 const d400 = [];
 const d500 = [];
 const d600 = [];
-const d700 = [];
-const d800 = [];
-const d900 = [];
 
-export const mazes = {d100, d200, d300, d400, d500, d600, d700, d800, d900};
+export const mazes = {d100, d200, d300, d400, d500, d600};
