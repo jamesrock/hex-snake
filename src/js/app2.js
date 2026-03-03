@@ -112,22 +112,52 @@ class Door {
 };
 
 class Maze extends GameBase {
-	constructor(data, mode = 'easy') {
+	constructor(data, mode = '100') {
 
 		super('maze');
 
 		this.settings = {
-      'easy': {
+      '100': {
         pixelSize: 15,
         width: 37,
         height: 49
       },
-      'medium': {
+      '200': {
         pixelSize: 12,
         width: 46,
         height: 61
       },
-      'hard': {
+      '300': {
+        pixelSize: 10,
+        width: 55,
+        height: 73
+      },
+      '400': {
+        pixelSize: 10,
+        width: 55,
+        height: 73
+      },
+      '500': {
+        pixelSize: 15,
+        width: 37,
+        height: 49
+      },
+      '600': {
+        pixelSize: 12,
+        width: 46,
+        height: 61
+      },
+      '700': {
+        pixelSize: 10,
+        width: 55,
+        height: 73
+      },
+      '800': {
+        pixelSize: 12,
+        width: 46,
+        height: 61
+      },
+      '900': {
         pixelSize: 10,
         width: 55,
         height: 73
@@ -355,14 +385,14 @@ directionsKeyMap = {
 },
 directionsArray = Object.keys(directionsKeyMap),
 rounder = new Rounder(30),
-mode = 'hard',
-snake = window.snake = new Maze(getLast(mazes[mode]), mode);
+mode = '300',
+snake = window.snake = new Maze(getLast(mazes[`d${mode}`]), mode);
 
 let touch = null;
 let xMovement = 0;
 let yMovement = 0;
 
-snake.renderTo(body);
+// snake.renderTo(body);
 
 document.addEventListener('keydown', (e) => {
 
@@ -438,4 +468,4 @@ document.addEventListener('drag-left', () => {
 
 });
 
-// window.maker = new Maker();
+window.maker = new Maker();

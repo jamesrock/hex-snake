@@ -75,10 +75,10 @@ class Grid extends DisplayObject {
   stateDataMap = {
     'wall-yes': 1,
     'wall-no': 0,
-    'coin-yes': 2,
-    'coin-no': 0
+    'door-yes': 2,
+    'door-no': 0
   };
-  stateAttributeMap = ['empty', 'wall', 'coin'];
+  stateAttributeMap = ['empty', 'wall', 'door'];
   guides = makeArray(25).map((value) => value * 3);
   pixels = [];
 };
@@ -89,7 +89,7 @@ export class Maker {
     const body = document.body;
 
     const settings = {
-      'easy': {
+      '100': {
         xPos: 3,
         yPos: 38,
         size: 1475,
@@ -97,7 +97,7 @@ export class Maker {
         width: 37,
         height: 49
       },
-      'medium': {
+      '200': {
         xPos: 3,
         yPos: 37,
         size: 1405,
@@ -105,7 +105,55 @@ export class Maker {
         width: 46,
         height: 61
       },
-      'hard': {
+      '300': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '400': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '500': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '600': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '700': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '800': {
+        xPos: 4,
+        yPos: 36,
+        size: 1370,
+        pixelSize: 12,
+        width: 55,
+        height: 73
+      },
+      '900': {
         xPos: 4,
         yPos: 36,
         size: 1370,
@@ -118,13 +166,13 @@ export class Maker {
     const maker = makeNode('div', 'maker');
     const inputs = makeNode('div', 'inputs');
     const target = makeNode('div', 'grid-target');
-    const difficulty = makeSelect(['easy', 'medium', 'hard'].map((a) => [a, a]));
-    const mode = makeSelect([['add wall', 'wall-yes'], ['remove wall', 'wall-no'], ['add coin', 'coin-yes'], ['remove coin', 'coin-no']]);
+    const difficulty = makeSelect(Object.keys(settings).map((a) => [a, a]));
+    const mode = makeSelect([['add wall', 'wall-yes'], ['remove wall', 'wall-no'], ['add door', 'door-yes'], ['remove door', 'door-no']]);
     const constrain = {
       'wall-yes': 'guide',
       'wall-no': 'guide',
-      'coin-yes': 'pixel',
-      'coin-no': 'pixel'
+      'door-yes': 'guide',
+      'door-no': 'guide'
     };
     const set = makeSelect(makeArray(10).map((a) => [`#${a + 1}`, a]));
     const copyButton = makeButton('copy', 'copy');
@@ -145,7 +193,7 @@ export class Maker {
       if(grid) {
         grid.destroy();
       };
-      grid = new Grid(Number(pixelSize.value), Number(width.value), Number(height.value), mazes[difficulty.value][set.value]);
+      grid = new Grid(Number(pixelSize.value), Number(width.value), Number(height.value), mazes[`d${difficulty.value}`][set.value]);
       grid.appendTo(target);
     };
 
