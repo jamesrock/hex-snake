@@ -14,6 +14,7 @@ import {
 } from '@jamesrock/rockjs';
 import { Maker } from './Maker';
 import { mazes } from './mazes';
+import { mapToGrid } from './utils';
 
 // console.log(mazes);
 
@@ -25,26 +26,6 @@ const makeAudio = (url) => {
   const audio = new Audio(url);
   audio.preload = true;
   return audio;
-};
-
-const mapToGrid = (pixels, w) => {
-  let x = 0;
-  let y = 0;
-  return pixels.map((a, index) => {
-
-    const bob = [a, x, y, index];
-
-    if(x > 0 && x%(w-1)===0) {
-      x = 0;
-      y ++;
-    }
-    else {
-      x ++;
-    };
-
-    return bob;
-
-  });
 };
 
 const makeCoins = (w, h) => {
@@ -85,7 +66,7 @@ class Coin {
 		this.x = x;
 		this.y = y;
 		this.color = color;
-		this.sound = makeAudio('/audio/point.mp3');
+		// this.sound = makeAudio('/audio/point.mp3');
 
 	};
 };

@@ -6,6 +6,7 @@ import {
 	makeButton,
 	makeSelect
 } from '@jamesrock/rockjs';
+import { mapToGrid } from './utils';
 import { mazes } from './mazes';
 
 const body = document.body;
@@ -24,7 +25,12 @@ class Grid extends DisplayObject {
 
     super();
 
+    this.size = s;
+    this.width = w;
+    this.height = h;
     this.data = data;
+    this.grid = mapToGrid(this.data, this.width);
+    this.map = this.grid.map(([type, x, y]) => `x${x}y${y}`);
 
     let x = 0;
     let y = 0;
@@ -34,34 +40,77 @@ class Grid extends DisplayObject {
     node.style.height = `${h*s + (gap * (h-1))}px`;
     node.style.gap = `${gap}px`;
 
-    makeArray(w*h).forEach((index) => {
-      const pixel = makeNode('div', 'grid-pixel');
-      pixel.style.width = pixel.style.height = `${s}px`;
-      pixel.dataset.index = index;
-      pixel.dataset.x = x;
-      pixel.dataset.y = y;
-      pixel.dataset.state === 'empty';
-      pixel.classList.add(this.guides.includes(x) || this.guides.includes(y) ? 'guide' : 'pixel');
-      node.append(pixel);
-      this.pixels.push(pixel);
+    const drawPixels = () => {
 
-      if(x > 0 && x%(w-1)===0) {
-        x = 0;
-        y ++;
-      }
-      else {
-        x ++;
-      };
+      makeArray(w*h).forEach((index) => {
+        const pixel = makeNode('div', 'grid-pixel');
+        pixel.style.width = pixel.style.height = `${s}px`;
+        pixel.dataset.index = index;
+        pixel.dataset.x = x;
+        pixel.dataset.y = y;
+        pixel.dataset.state === 'empty';
+        pixel.classList.add(this.guides.includes(x) || this.guides.includes(y) ? 'guide' : 'pixel');
+        node.append(pixel);
+        this.pixels.push(pixel);
 
-    });
+        if(x > 0 && x%(w-1)===0) {
+          x = 0;
+          y ++;
+        }
+        else {
+          x ++;
+        };
+
+      });
+
+    };
+
+    const drawGuides = () => {
+
+      const xPixels = (w-1)/3;
+      const yPixels = (h-1)/3;
+      const combined = ((xPixels * yPixels) * 4);
+
+      makeArray((w*h) - combined).forEach(() => {
+
+        const pixel = makeNode('div', 'grid-pixel');
+        pixel.style.width = pixel.style.height = `${s}px`;
+        pixel.dataset.index = this.map.indexOf(`x${x}y${y}`);
+        pixel.dataset.x = x;
+        pixel.dataset.y = y;
+        pixel.dataset.state === 'empty';
+        const isYGuide = this.guides.includes(y);
+        pixel.classList.add('guide');
+        pixel.style.position = 'absolute';
+        pixel.style.left = `${x*s + (x+1)}px`;
+        pixel.style.top = `${y*s + (y+1)}px`;
+        node.append(pixel);
+        this.pixels.push(pixel);
+
+        if(x > 0 && x%(w-1)===0) {
+          x = 0;
+          y ++;
+        }
+        else {
+          x += isYGuide ? 1 : 3;
+        };
+
+      });
+
+    };
+
+    // drawPixels();
+    drawGuides();
 
     this.fill();
+
+    console.log(this);
 
   };
   fill() {
 
-    this.data.forEach((value, index) => {
-      this.pixels[index].dataset.state = this.stateAttributeMap[value];
+    this.grid.filter(([type]) => type>0).forEach(([type, x, y]) => {
+      this.node.querySelector([`[data-x="${x}"][data-y="${y}"]`]).dataset.state = this.stateAttributeMap[type];
     });
 
     return this;
