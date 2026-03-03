@@ -71,11 +71,10 @@ class Grid extends DisplayObject {
       const yPixels = (h-1)/3;
       const combined = ((xPixels * yPixels) * 4);
 
-      makeArray((w*h) - combined).forEach(() => {
+      makeArray((w*h) - combined).forEach((index) => {
 
         const pixel = makeNode('div', 'grid-pixel');
         pixel.style.width = pixel.style.height = `${s}px`;
-        pixel.dataset.index = this.map.indexOf(`x${x}y${y}`);
         pixel.dataset.x = x;
         pixel.dataset.y = y;
         pixel.dataset.state === 'empty';
@@ -110,17 +109,23 @@ class Grid extends DisplayObject {
   fill() {
 
     this.grid.filter(([type]) => type>0).forEach(([type, x, y]) => {
-      this.node.querySelector([`[data-x="${x}"][data-y="${y}"]`]).dataset.state = this.stateAttributeMap[type];
+      this.get(x, y).dataset.state = this.stateAttributeMap[type];
     });
 
     return this;
 
   };
-  set(index, value) {
+  set(x, y, value) {
 
-    this.data[index] = this.stateDataMap[value];
-    this.pixels[index].dataset.state = this.stateAttributeMap[this.data[index]];
+    const dataIndex = this.map.indexOf(`x${x}y${y}`);
+    this.data[dataIndex] = this.stateDataMap[value];
+    this.get(x, y).dataset.state = this.stateAttributeMap[this.data[dataIndex]];
     return this;
+
+  };
+  get(x, y) {
+
+    return this.node.querySelector([`[data-x="${x}"][data-y="${y}"]`]);
 
   };
   stateDataMap = {
@@ -296,7 +301,7 @@ export class Maker {
      	if(knob?.classList.contains(constrain[mode.value])) {
     		if(knobs.indexOf(knob)===-1) {
      			knobs.push(knob);
-          grid.set(knob.dataset.index, mode.value);
+          grid.set(knob.dataset.x, knob.dataset.y, mode.value);
     		};
      	};
      	e.preventDefault();
