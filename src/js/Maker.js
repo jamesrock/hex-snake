@@ -71,7 +71,7 @@ class Grid extends DisplayObject {
       const yPixels = (h-1)/3;
       const combined = ((xPixels * yPixels) * 4);
 
-      makeArray((w*h) - combined).forEach((index) => {
+      makeArray((w*h) - combined).forEach(() => {
 
         const pixel = makeNode('div', 'grid-pixel');
         pixel.style.width = pixel.style.height = `${s}px`;
