@@ -15,26 +15,17 @@ import {
 import { Maker } from './Maker';
 import { mazes } from './mazes';
 
+// console.log(mazes);
+
 setDocumentHeight();
 
-class Sounds {
-  constructor(url) {
-
-    this.url = url;
-
-  };
-  play() {
-
-    const source = new Audio(this.url);
-
-    source.addEventListener('canplaythrough', (event) => {
-      source.play();
-    });
-
-  };
-};
-
 const scaler = new Scaler(2);
+
+const makeAudio = (url) => {
+  const audio = new Audio(url);
+  audio.preload = true;
+  return audio;
+};
 
 const mapToGrid = (pixels, w) => {
   let x = 0;
@@ -57,15 +48,15 @@ const mapToGrid = (pixels, w) => {
 };
 
 const makeCoins = (w, h) => {
-  let x = 1;
+  let x = 4;
   let y = 1;
   const limit = ((w-1)/3);
   const rows = ((h-1)/3);
-  return makeArray(limit*rows).map((index) => {
+  return makeArray((limit*rows)-1).map((index) => {
 
     const coin = new Coin(x, y);
 
-    if(x > 0 && x%(w-3)===0) {
+    if(x > 0 && x%(w-3) === 0) {
       x = 1;
       y += 3;
     }
@@ -94,6 +85,7 @@ class Coin {
 		this.x = x;
 		this.y = y;
 		this.color = color;
+		this.sound = makeAudio('/audio/point.mp3');
 
 	};
 };
@@ -104,6 +96,17 @@ class Man {
 		this.x = x;
 		this.y = y;
 		this.color = color;
+
+	};
+};
+
+class Door {
+	constructor(x, y, color = 'deeppink') {
+
+		this.x = x;
+		this.y = y;
+		this.color = color;
+		this.open = false;
 
 	};
 };
@@ -138,19 +141,19 @@ class Maze extends GameBase {
 		this.height = this.props.height;
 		// this.size = scaler.inflate(targetWidth / this.props.width);
 		// this.size = scaler.inflate(60);
-		this.size = scaler.inflate(16);
+		this.size = scaler.inflate(30);
+		// this.size = scaler.inflate(10);
 
 		const grid = mapToGrid(data, this.props.width);
 
 		this.data = data;
-		this.walls = grid.filter((a) => a[0]===1).map(([isWall, x, y]) => new Wall(x, y));
-		// this.coins = grid.filter((a) => a[0]===2).map(([isWall, x, y]) => new Coin(x, y));
+		this.walls = grid.filter((a) => a[0]===1).map(([type, x, y]) => new Wall(x, y));
+		this.map = this.walls.map((wall) => (`x${wall.x+this.x}y${wall.y+this.y}`));
+		this.doors = grid.filter((a) => a[0]===2).map(([isWall, x, y]) => new Door(x, y));
 		this.coins = makeCoins(this.props.width, this.props.height);
 		this.countCount = this.coins.length;
 
-		// this.canvas.width = this.inflate(this.width);
 		this.canvas.width = scaler.inflate(window.innerWidth);
-		// this.canvas.height = this.inflate(this.height);
 		this.canvas.height = scaler.inflate(window.innerHeight);
 		this.canvas.style.width = `${scaler.deflate(this.canvas.width)}px`;
 
@@ -181,12 +184,16 @@ class Maze extends GameBase {
 			this.ctx.fillRect(this.inflate(x + this.x), this.inflate(y + this.y), this.size, this.size);
 		});
 
+		this.doors.filter((door) => !door.open).forEach(({x, y, color}) => {
+			this.ctx.fillStyle = color;
+			this.ctx.fillRect(this.inflate(x + this.x), this.inflate(y + this.y), this.size, this.size);
+		});
+
 		this.coins.forEach(({x, y, color}) => {
 			this.ctx.fillStyle = color;
 			this.ctx.beginPath();
       this.ctx.arc(this.inflate((x + 1) + this.x), this.inflate((y + 1) + this.y), this.size*0.6, 0, 2 * Math.PI);
       this.ctx.fill();
-			// this.ctx.fillRect(this.inflate(x + this.x), this.inflate(y + this.y), this.size, this.size);
 		});
 
 		this.men.forEach(({x, y, color}) => {
@@ -208,12 +215,12 @@ class Maze extends GameBase {
 		const numberOfYPixels = floorTo(window.innerHeight / onePixel);
 
 		this.x = floorTo((numberOfXPixels / 2) - 2);
-		this.y = floorTo((numberOfYPixels / 2));
+		this.y = floorTo((numberOfYPixels / 2) - 4);
 
 		// this.x = 20;
 		// this.y = 20;
 
-		this.men = [new Man(this.x + 1, this.y - 3)];
+		this.men = [new Man(this.x + 1, this.y + 1)];
 		this.score = 0;
 		this.gameOver = false;
 
@@ -231,7 +238,14 @@ class Maze extends GameBase {
 			this.coins.splice(this.coins.indexOf(coin), 1);
 			// coin.color = 'magenta';
 			this.score ++;
-			// sound.play();
+
+			// coin.sound.play();
+
+			if(this.coins.length === 0) {
+			  this.doors.forEach((door) => {
+					door.open = true;
+				});
+			};
 
 			this.updateScore();
 
@@ -261,8 +275,8 @@ class Maze extends GameBase {
       break;
 		};
 
-		this.render();
 		this.checkCoins();
+		this.render();
 
 		return this;
 
@@ -286,12 +300,14 @@ class Maze extends GameBase {
       break;
 		};
 
-    return ![
-			`x${x}y${y}`, // top left
-			`x${x+1}y${y}`, // top right
-			`x${x}y${y+1}`, // bottom right
-			`x${x+1}y${y+1}`, // bottom left
-		].map((q) => this.checkForWall(q)).includes(true);
+		const queries = [
+     	`x${x}y${y}`, // top left
+     	`x${x+1}y${y}`, // top right
+     	`x${x}y${y+1}`, // bottom right
+     	`x${x+1}y${y+1}`, // bottom left
+    ];
+
+    return !queries.map((q) => this.checkForWall(q)).includes(true) && !queries.map((q) => this.checkForDoor(q)).includes(true);
 
 	};
 	renderTo(to) {
@@ -308,6 +324,11 @@ class Maze extends GameBase {
 	checkForWall(q) {
 
 		return this.walls.map((wall) => (`x${wall.x+this.x}y${wall.y+this.y}`)).includes(q);
+
+	};
+	checkForDoor(q) {
+
+		return this.doors.filter((door) => !door.open).map((door) => (`x${door.x+this.x}y${door.y+this.y}`)).includes(q);
 
 	};
 	stop() {
@@ -332,9 +353,8 @@ directionsKeyMap = {
 	ArrowRight: 'right',
 	ArrowDown: 'down'
 },
-sound = new Sounds('/audio/point.mp3'),
 directionsArray = Object.keys(directionsKeyMap),
-rounder = new Rounder(20),
+rounder = new Rounder(30),
 mode = 'hard',
 snake = window.snake = new Maze(getLast(mazes[mode]), mode);
 
