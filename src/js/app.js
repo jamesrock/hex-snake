@@ -70,14 +70,14 @@ class Snake extends GameBase {
 
 		this.canvas.width = this.inflate(this.width);
 
-		this.segments.forEach((seg) => {
+		this.segments.forEach(({x, y}) => {
 			this.ctx.fillStyle = this.color;
-			this.ctx.fillRect(this.inflate(seg.x), this.inflate(seg.y), this.size, this.size);
+			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size, this.size);
 		});
 
-		this.foods.forEach((food) => {
-			this.ctx.fillStyle = food.color;
-			this.ctx.fillRect(this.inflate(food.x), this.inflate(food.y), this.size, this.size);
+		this.foods.forEach(({color, x, y}) => {
+			this.ctx.fillStyle = color;
+			this.ctx.fillRect(this.inflate(x), this.inflate(y), this.size, this.size);
 		});
 
 		this.animationFrame = requestAnimationFrame(() => {

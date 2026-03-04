@@ -36,8 +36,8 @@ class Grid extends DisplayObject {
     let y = 0;
     const gap = 1;
     const node = this.node = makeNode('div', 'grid');
-    node.style.width = `${w*s + (gap * (w-1))}px`;
-    node.style.height = `${h*s + (gap * (h-1))}px`;
+    node.style.width = `${w*s+(gap*(w-1))}px`;
+    node.style.height = `${h*s+(gap*(h-1))}px`;
     node.style.gap = `${gap}px`;
 
     const drawPixels = () => {
@@ -69,7 +69,7 @@ class Grid extends DisplayObject {
 
       const xPixels = (w-1)/3;
       const yPixels = (h-1)/3;
-      const combined = ((xPixels * yPixels) * 4);
+      const combined = ((xPixels*yPixels)*4);
 
       makeArray((w*h) - combined).forEach(() => {
 
@@ -81,8 +81,8 @@ class Grid extends DisplayObject {
         const isYGuide = this.guides.includes(y);
         pixel.classList.add('guide');
         pixel.style.position = 'absolute';
-        pixel.style.left = `${x*s + (x+1)}px`;
-        pixel.style.top = `${y*s + (y+1)}px`;
+        pixel.style.left = `${x*s+(x+1)}px`;
+        pixel.style.top = `${y*s+(y+1)}px`;
         node.append(pixel);
         this.pixels.push(pixel);
 

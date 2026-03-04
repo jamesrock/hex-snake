@@ -22,6 +22,27 @@ setDocumentHeight();
 
 const scaler = new Scaler(2);
 
+class SoundManager {
+  constructor(url) {
+
+    this.sounds = makeArray(5, () => makeAudio(url));
+
+  };
+  play() {
+
+    this.sounds[this.index].play();
+
+    if(this.index<this.sounds.length-1) {
+      this.index ++;
+    }
+    else {
+      this.index = 0;
+    };
+
+  };
+  index = 0;
+};
+
 const makeAudio = (url) => {
   const audio = new Audio(url);
   audio.preload = true;
@@ -66,7 +87,6 @@ class Coin {
 		this.x = x;
 		this.y = y;
 		this.color = color;
-		// this.sound = makeAudio('/audio/point.mp3');
 
 	};
 };
@@ -146,6 +166,7 @@ class Maze extends GameBase {
 		this.walls = grid.filter(([type]) => type===1).map(([type, x, y]) => new Wall(x, y));
 		this.doors = grid.filter(([type]) => type===2).map(([type, x, y]) => new Door(x, y));
 		this.coins = makeCoins(this.props.width, this.props.height);
+		this.sounds = new SoundManager('/audio/point.mp3');
 		this.countCount = this.coins.length;
 
 		this.canvas.width = scaler.inflate(window.innerWidth);
@@ -234,7 +255,7 @@ class Maze extends GameBase {
 			// coin.color = 'magenta';
 			this.score ++;
 
-			// coin.sound.play();
+			this.sounds.play();
 
 			if(this.coins.length === 0) {
 			  this.doors.forEach((door) => {
@@ -357,8 +378,6 @@ let touch = null;
 let xMovement = 0;
 let yMovement = 0;
 
-// snake.renderTo(body);
-
 document.addEventListener('keydown', (e) => {
 
 	if(isValidKey(e.code, directionsArray)) {
@@ -433,4 +452,5 @@ document.addEventListener('drag-left', () => {
 
 });
 
-window.maker = new Maker();
+snake.renderTo(body);
+// window.maker = new Maker();
