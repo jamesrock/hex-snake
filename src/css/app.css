@@ -37,9 +37,6 @@
 	--background: beige;
 	--foreground: #555;
 
-	--background: black;
-	--foreground: #555;
-
 	@media (prefers-color-scheme: dark) {
 		--background: #1C1C1C;
 		--foreground: white;
@@ -149,68 +146,4 @@ canvas {
 		pointer-events: none;
 	}
 
-}
-
-input[type="number"] {
-  width: 80px;
-  padding: 5px;
-  font-size: inherit;
-}
-
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  border: solid 1px red;
-  background-color: rgba(255, 0, 0, 0.15);
-  .grid-pixel {
-    background-color: rgba(255, 0, 0, 0.5);
-    &[data-state="wall"] {
-      background-color: black;
-    }
-    &[data-state="door"] {
-      background-color: red;
-    }
-  }
-}
-
-.inputs {
-  padding-top: 10px;
-  position: absolute;
-  background-color: white;
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-}
-
-.inputs-top,
-.inputs-bottom {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-
-  select {
-    padding: 0 10px;
-  }
-}
-
-button.copy {
-  font-size: inherit;
-  color: white;
-  font-weight: bold;
-  background-color: magenta;
-  border: 0;
-  padding: 5px 15px;
-}
-
-.stats {
-  position: absolute;
-  top: 50px;
-  left: 50px;
-  font-size: 80px;
-  font-family: monospace;
-  letter-spacing: -2px;
-}
-
-.grid-target {
-  position: relative;
 }
