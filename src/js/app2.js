@@ -25,7 +25,7 @@ const scaler = new Scaler(2);
 class SoundManager {
   constructor(url) {
 
-    this.sounds = makeArray(5, () => makeAudio(url));
+    this.sounds = makeArray(10, () => makeAudio(url));
 
   };
   play() {
@@ -155,16 +155,12 @@ class Maze extends GameBase {
 
 		this.width = this.props.width;
 		this.height = this.props.height;
-		// this.size = scaler.inflate(targetWidth / this.props.width);
-		// this.size = scaler.inflate(60);
-		this.size = scaler.inflate(30);
+		this.size = scaler.inflate(40);
 		// this.size = scaler.inflate(10);
-
-		const grid = mapToGrid(data, this.props.width);
-
 		this.data = data;
-		this.walls = grid.filter(([type]) => type===1).map(([type, x, y]) => new Wall(x, y));
-		this.doors = grid.filter(([type]) => type===2).map(([type, x, y]) => new Door(x, y));
+		this.grid = mapToGrid(data, this.props.width);
+		this.walls = this.grid.filter(([type]) => type===1).map(([type, x, y]) => new Wall(x, y));
+		this.doors = this.grid.filter(([type]) => type===2).map(([type, x, y]) => new Door(x, y));
 		this.coins = makeCoins(this.props.width, this.props.height);
 		this.sounds = new SoundManager('/audio/point.mp3');
 		this.countCount = this.coins.length;
