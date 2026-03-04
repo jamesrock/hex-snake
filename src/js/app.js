@@ -11,7 +11,6 @@ import {
 	pluckFirst,
 	pluckRandom,
 } from '@jamesrock/rockjs';
-import { Maker } from './Maker';
 
 setDocumentHeight();
 
@@ -218,12 +217,6 @@ class Snake extends GameBase {
 		return this;
 
 	};
-	renderTo(to) {
-
-		to.appendChild(this.node);
-		return this;
-
-	};
 	reset() {
 
 		this.score = 0;
@@ -370,7 +363,7 @@ snake = window.snake = new Snake();
 let touchX = 0;
 let touchY = 0;
 
-// snake.renderTo(body);
+snake.appendTo(body);
 
 document.addEventListener('keydown', (e) => {
 
@@ -422,5 +415,3 @@ document.addEventListener('touchmove', (e) => {
 	snake.turn(direction);
 
 });
-
-new Maker();
