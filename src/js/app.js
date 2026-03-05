@@ -1,9 +1,9 @@
 import '/css/app.css';
 import {
-	Rounder,
 	Scaler,
 	GameBase,
 	setDocumentHeight,
+	addDragListeners,
 	isValidKey,
 	makeArray,
 	random,
@@ -357,11 +357,7 @@ opposites = {
 	down: 'up'
 },
 directionsArray = Object.keys(directionsKeyMap),
-rounder = new Rounder(60),
 snake = window.snake = new Snake();
-
-let touchX = 0;
-let touchY = 0;
 
 snake.appendTo(body);
 
@@ -385,33 +381,28 @@ document.addEventListener('click', () => {
 
 });
 
-document.addEventListener('touchstart', (e) => {
+addDragListeners(document, 60);
 
-	touchX = e.touches[0].clientX;
-	touchY = e.touches[0].clientY;
+document.addEventListener('drag-down', () => {
+
+	snake.turn('down');
 
 });
 
-document.addEventListener('touchmove', (e) => {
+document.addEventListener('drag-right', () => {
 
-	const { clientX, clientY } = e.touches[0];
-	const touchXDiff = rounder.round(clientX - touchX);
-	const touchYDiff = rounder.round(clientY - touchY);
-	let direction;
+	snake.turn('right');
 
-	if((touchXDiff > 0)) {
-		direction = directions.right;
-	}
-	else if((touchXDiff < 0)) {
-		direction = directions.left;
-	}
-	else if((touchYDiff > 0)) {
-		direction = directions.down;
-	}
-	else if((touchYDiff < 0)) {
-		direction = directions.up;
-	};
+});
 
-	snake.turn(direction);
+document.addEventListener('drag-left', () => {
+
+	snake.turn('left');
+
+});
+
+document.addEventListener('drag-up', () => {
+
+	snake.turn('up');
 
 });
